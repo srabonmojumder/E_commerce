@@ -1,11 +1,17 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Package, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OrderSuccessPage() {
-    const orderNumber = `LUX-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const [orderNumber, setOrderNumber] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Generate order number only on client side to avoid hydration mismatch
+        setOrderNumber(`LUX-${Math.random().toString(36).substr(2, 9).toUpperCase()}`);
+    }, []);
 
     return (
         <div className="pt-20 min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -48,7 +54,11 @@ export default function OrderSuccessPage() {
                             Order Number
                         </h3>
                     </div>
-                    <p className="text-2xl font-bold text-primary-600">{orderNumber}</p>
+                    <p className="text-2xl font-bold text-primary-600">
+                        {orderNumber || (
+                            <span className="inline-block w-40 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        )}
+                    </p>
                 </motion.div>
 
                 <motion.div
