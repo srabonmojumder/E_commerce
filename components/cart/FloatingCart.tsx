@@ -5,20 +5,26 @@ import { ShoppingCart, X, Minus, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function FloatingCart() {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
     const cart = useStore((state) => state.cart);
     const removeFromCart = useStore((state) => state.removeFromCart);
     const updateQuantity = useStore((state) => state.updateQuantity);
     const getTotalPrice = useStore((state) => state.getTotalPrice);
     const getTotalItems = useStore((state) => state.getTotalItems);
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const totalItems = getTotalItems();
     const totalPrice = getTotalPrice();
 
-    if (totalItems === 0) return null;
+    if (!mounted || totalItems === 0) return null;
 
     return (
         <>

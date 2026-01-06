@@ -12,10 +12,16 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
     const cart = useStore((state) => state.cart);
     const wishlist = useStore((state) => state.wishlist);
     const getTotalItems = useStore((state) => state.getTotalItems);
     const compareProducts = useCompareStore((state) => state.compareProducts);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -32,8 +38,8 @@ export default function Navbar() {
         <>
             <nav
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                        ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-xl'
-                        : 'bg-white dark:bg-gray-900 shadow-md'
+                    ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-xl'
+                    : 'bg-white dark:bg-gray-900 shadow-md'
                     }`}
             >
                 {/* Top Banner */}
@@ -112,7 +118,7 @@ export default function Navbar() {
                             <Link href="/compare" className="relative group hidden md:block">
                                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                                     <GitCompare className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-blue-500 transition-colors" />
-                                    {compareProducts.length > 0 && (
+                                    {mounted && compareProducts.length > 0 && (
                                         <motion.span
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
@@ -128,7 +134,7 @@ export default function Navbar() {
                             <Link href="/wishlist" className="relative group">
                                 <motion.div whileHover={{ scale: 1.1, rotate: [0, -10, 10, 0] }} whileTap={{ scale: 0.9 }}>
                                     <Heart className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-red-500 group-hover:fill-red-500 transition-all" />
-                                    {wishlist.length > 0 && (
+                                    {mounted && wishlist.length > 0 && (
                                         <motion.span
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
@@ -145,11 +151,11 @@ export default function Navbar() {
                                 <motion.div
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
-                                    animate={totalItems > 0 ? { y: [0, -5, 0] } : {}}
+                                    animate={mounted && totalItems > 0 ? { y: [0, -5, 0] } : {}}
                                     transition={{ duration: 0.5 }}
                                 >
                                     <ShoppingCart className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-purple-600 transition-colors" />
-                                    {totalItems > 0 && (
+                                    {mounted && totalItems > 0 && (
                                         <motion.span
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}

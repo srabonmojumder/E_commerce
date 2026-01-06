@@ -12,6 +12,10 @@ export interface Product {
     reviews: number;
     inStock: boolean;
     discount?: number;
+    stock?: number;
+    colors?: string[];
+    sizes?: string[];
+    tags?: string[];
 }
 
 export interface CartItem extends Product {

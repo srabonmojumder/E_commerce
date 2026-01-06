@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FloatingCart from "@/components/cart/FloatingCart";
 import LiveChat from "@/components/chat/LiveChat";
+import FloatingActionButton from "@/components/ui/FloatingActionButton";
 
 export const metadata: Metadata = {
     title: "LuxeCart - Premium E-Commerce Store",
@@ -34,6 +35,7 @@ export default function RootLayout({
                 {/* Floating Components */}
                 <FloatingCart />
                 <LiveChat />
+                <FloatingActionButton />
 
                 <Toaster
                     position="top-right"
