@@ -329,7 +329,7 @@ export default function Home() {
                         </motion.div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
                         {featuredProducts.map((product) => (
                             <ProductCard
                                 key={product.id}
@@ -366,7 +366,7 @@ export default function Home() {
                                 </h2>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
                             {recentProducts.slice(0, 5).map((product) => (
                                 <ProductCard
                                     key={product.id}
