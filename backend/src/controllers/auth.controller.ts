@@ -33,18 +33,23 @@ async function dispatchVerification(user: { id: number; email: string; displayNa
   await sendVerificationEmail(user.email, user.displayName, link);
 }
 
+// Frontend and API are deployed on different domains, so the browser treats
+// every request between them as cross-site — SameSite=Lax would silently drop
+// the cookie on those requests. 'none' (with Secure) is required in production.
+const isProd = env.NODE_ENV === 'production';
+const REFRESH_COOKIE_OPTS = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+  path: '/api/auth',
+};
+
 function setRefreshCookie(res: Response, token: string) {
-  res.cookie(REFRESH_COOKIE, token, {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/api/auth',
-    maxAge: REFRESH_MAX_AGE,
-  });
+  res.cookie(REFRESH_COOKIE, token, { ...REFRESH_COOKIE_OPTS, maxAge: REFRESH_MAX_AGE });
 }
 
 function clearRefreshCookie(res: Response) {
-  res.clearCookie(REFRESH_COOKIE, { path: '/api/auth' });
+  res.clearCookie(REFRESH_COOKIE, REFRESH_COOKIE_OPTS);
 }
 
 /** Persist a refresh token (hashed) so it can be rotated/revoked. */
