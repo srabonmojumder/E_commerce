@@ -8,3 +8,5 @@ prisma/data/*.json
 # uploaded files (keep the dir, ignore contents)
 uploads/*
 !uploads/.gitkeep
+.vercel
+.env*

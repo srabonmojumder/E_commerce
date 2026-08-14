@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "postinstall": "prisma generate",
     "build": "tsc",
     "start": "node dist/index.js",
     "extract": "node scripts/extract-data.mjs",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
     "@prisma/client": "^6.2.1",
+    "@vercel/blob": "^0.27.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

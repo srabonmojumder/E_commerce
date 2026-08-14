@@ -259,11 +259,10 @@ async function main() {
   // ---- 6b. recompute product rating aggregates from the new reviews ----
   console.log('   updating product rating aggregates...');
   await prisma.$executeRawUnsafe(
-    `UPDATE Product p
-       JOIN (SELECT productId, COUNT(*) c, AVG(rating) a FROM Review GROUP BY productId) r
-         ON p.id = r.productId
-        SET p.reviewCount = r.c, p.ratingAvg = r.a
-      WHERE p.slug LIKE 'perf-${runId}-p%'`,
+    `UPDATE "Product" p
+        SET "reviewCount" = r.c, "ratingAvg" = r.a
+       FROM (SELECT "productId", COUNT(*) c, AVG(rating) a FROM "Review" GROUP BY "productId") r
+      WHERE p.id = r."productId" AND p.slug LIKE 'perf-${runId}-p%'`,
   );
 
   // ---- 7. orders + order items ----

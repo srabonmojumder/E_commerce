@@ -390,15 +390,15 @@ export const adminDashboard = asyncHandler(async (_req: Request, res: Response) 
     prisma.order.aggregate({ _sum: { total: true }, where: { status: { in: [...REVENUE_STATUSES] } } }),
     prisma.review.aggregate({ _avg: { rating: true }, _count: true }),
     prisma.$queryRaw<{ ym: string; rev: string | null; cnt: bigint }[]>`
-      SELECT DATE_FORMAT(createdAt, '%Y-%m') AS ym, SUM(total) AS rev, COUNT(*) AS cnt
-      FROM \`Order\`
-      WHERE status IN ('PAID','PROCESSING','SHIPPED','DELIVERED') AND createdAt >= ${since12}
+      SELECT TO_CHAR("createdAt", 'YYYY-MM') AS ym, SUM(total) AS rev, COUNT(*) AS cnt
+      FROM "Order"
+      WHERE status IN ('PAID','PROCESSING','SHIPPED','DELIVERED') AND "createdAt" >= ${since12}
       GROUP BY ym ORDER BY ym`,
     prisma.$queryRaw<{ wd: number; hr: number; c: bigint }[]>`
-      SELECT (DAYOFWEEK(createdAt) - 1) AS wd, HOUR(createdAt) AS hr, COUNT(*) AS c
-      FROM \`Order\` GROUP BY wd, hr`,
+      SELECT EXTRACT(DOW FROM "createdAt")::int AS wd, EXTRACT(HOUR FROM "createdAt")::int AS hr, COUNT(*) AS c
+      FROM "Order" GROUP BY wd, hr`,
     prisma.$queryRaw<{ rating: number; c: bigint }[]>`
-      SELECT rating, COUNT(*) AS c FROM \`Review\` GROUP BY rating`,
+      SELECT rating, COUNT(*) AS c FROM "Review" GROUP BY rating`,
     prisma.user.count({ where: { createdAt: { gte: startOfThisMonth } } }),
     prisma.user.count({ where: { createdAt: { gte: startOfPrevMonth, lt: startOfThisMonth } } }),
     prisma.order.aggregate({ _sum: { total: true }, where: { status: { in: [...REVENUE_STATUSES] }, createdAt: { gte: since30 } } }),

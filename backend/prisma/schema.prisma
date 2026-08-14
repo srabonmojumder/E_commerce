@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -444,7 +444,7 @@ model Post {
   slug        String   @unique
   title       String
   excerpt     String?  @db.Text
-  content     String   @db.LongText // body (markdown or HTML)
+  content     String   @db.Text // body (markdown or HTML)
   image       String
   author      String   @default("Admin")
   tags        Json? // simple string[] e.g. ["design", "tips"]
