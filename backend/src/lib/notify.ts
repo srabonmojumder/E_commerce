@@ -1,5 +1,6 @@
 import { sendEmail } from './mailer.js';
 import { sendSms } from './sms.js';
+import { formatMoney } from './currency.js';
 
 interface ItemLite {
   name: string;
@@ -26,14 +27,17 @@ export async function notifyOrderPlaced(p: {
   orderId: number;
   total: number;
   items: ItemLite[];
+  currencySymbol?: string;
+  exchangeRate?: number;
 }) {
   const r = ref(p.orderId);
+  const money = formatMoney(p.total, p.currencySymbol ?? '$', p.exchangeRate ?? 1);
   const list = p.items.map((i) => `• ${i.name} × ${i.quantity}`).join('<br/>');
   const html =
     `<h2>Thank you${p.name ? `, ${p.name}` : ''}! 🎉</h2>` +
     `<p>Your order <b>${r}</b> has been placed successfully.</p>` +
     `<p>${list}</p>` +
-    `<p><b>Total: $${p.total.toFixed(2)}</b></p>` +
+    `<p><b>Total: ${money}</b></p>` +
     `<p>You can track your order anytime from your account.</p>`;
 
   try {
@@ -41,7 +45,7 @@ export async function notifyOrderPlaced(p: {
       to: p.to,
       subject: `Order ${r} confirmed`,
       html,
-      text: `Your order ${r} is confirmed. Total $${p.total.toFixed(2)}.`,
+      text: `Your order ${r} is confirmed. Total ${money}.`,
     });
   } catch (e) {
     console.error('Order-placed email failed:', e);
@@ -49,7 +53,7 @@ export async function notifyOrderPlaced(p: {
 
   if (p.phone) {
     try {
-      await sendSms(p.phone, `LuxeCart: Order ${r} confirmed! Total $${p.total.toFixed(2)}. Track it in your account.`);
+      await sendSms(p.phone, `LuxeCart: Order ${r} confirmed! Total ${money}. Track it in your account.`);
     } catch (e) {
       console.error('Order-placed SMS failed:', e);
     }

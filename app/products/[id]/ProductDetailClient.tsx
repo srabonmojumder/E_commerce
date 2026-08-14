@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, Star, Truck, Shield, RotateCcw, Share2, Minus, Plus, Bell } from 'lucide-react';
 import { useStore } from '@/store/useStore';
-import { useProduct, useRelatedProducts } from '@/lib/hooks';
+import { useProduct, useRelatedProducts, useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 import ProductCard from '@/components/product/ProductCard';
 import StickyMobileBar from '@/components/product/StickyMobileBar';
 import ReviewSection from '@/components/product/ReviewSection';
@@ -21,6 +22,7 @@ export default function ProductDetailPage() {
     const slug = params.id as string; // route param holds the product slug
     const { product, isLoading } = useProduct(slug);
     const { related: relatedProducts } = useRelatedProducts(slug);
+    const { settings } = useDisplayCurrency();
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -333,18 +335,18 @@ export default function ProductDetailPage() {
                                 {product.discount ? (
                                     <>
                                         <span className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-accent-600">
-                                            ${discountedPrice.toFixed(2)}
+                                            {formatPrice(discountedPrice, settings)}
                                         </span>
                                         <span className="text-sm xs:text-lg md:text-2xl text-slate-400 line-through">
-                                            ${product.price.toFixed(2)}
+                                            {formatPrice(product.price, settings)}
                                         </span>
                                         <span className="text-[10px] xs:text-xs sm:text-sm font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 xs:px-2 py-0.5 rounded-full">
-                                            Save ${(product.price - discountedPrice).toFixed(2)}
+                                            Save {formatPrice(product.price - discountedPrice, settings)}
                                         </span>
                                     </>
                                 ) : (
                                     <span className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-                                        ${product.price.toFixed(2)}
+                                        {formatPrice(product.price, settings)}
                                     </span>
                                 )}
                             </div>

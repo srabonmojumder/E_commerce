@@ -22,5 +22,6 @@ export function serializeSettings(s: Awaited<ReturnType<typeof getSettings>>) {
     taxRate: s.taxRate,
     currencyCode: s.currencyCode,
     currencySymbol: s.currencySymbol,
+    exchangeRate: s.exchangeRate,
   };
 }

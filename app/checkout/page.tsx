@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import StripePayment from '@/components/checkout/StripePayment';
 import { api, ApiError } from '@/lib/api';
 import { useAddresses, useSettings, usePaymentMethods, useLoyalty } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 const STRIPE_ENABLED = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 import Link from 'next/link';
@@ -93,7 +94,7 @@ export default function CheckoutPage() {
             );
             if (res.valid) {
                 setCoupon({ code: res.code, discount: res.discount });
-                toast.success(`Coupon applied — you saved $${res.discount.toFixed(2)}`);
+                toast.success(`Coupon applied — you saved ${formatPrice(res.discount, settings)}`);
             } else {
                 setCoupon(null);
                 toast.error(res.message);
@@ -540,7 +541,7 @@ export default function CheckoutPage() {
                                                 <p className="text-[10px] md:text-xs text-gray-400">Qty: {item.quantity}</p>
                                             </div>
                                             <span className="text-sm font-bold text-primary dark:text-white">
-                                                ${(price * item.quantity).toFixed(2)}
+                                                {formatPrice(price * item.quantity, settings)}
                                             </span>
                                         </div>
                                     );
@@ -586,7 +587,7 @@ export default function CheckoutPage() {
                                                 </span>
                                                 <span className="text-xs text-gray-500">
                                                     {canRedeem
-                                                        ? `Use ${redeemingPoints || maxRedeemablePoints} pts (−$${(((redeemingPoints || maxRedeemablePoints)) * pointValue).toFixed(2)})`
+                                                        ? `Use ${redeemingPoints || maxRedeemablePoints} pts (−${formatPrice((redeemingPoints || maxRedeemablePoints) * pointValue, settings)})`
                                                         : `Min ${minRedeem} pts to redeem`}
                                                 </span>
                                             </span>
@@ -601,31 +602,31 @@ export default function CheckoutPage() {
                             <div className="space-y-3 pt-4 border-t border-primary/10">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-500">Subtotal</span>
-                                    <span className="font-semibold text-primary dark:text-white">${totalPrice.toFixed(2)}</span>
+                                    <span className="font-semibold text-primary dark:text-white">{formatPrice(totalPrice, settings)}</span>
                                 </div>
                                 {discount > 0 && (
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">Discount</span>
-                                        <span className="font-semibold text-new">−${discount.toFixed(2)}</span>
+                                        <span className="font-semibold text-new">−{formatPrice(discount, settings)}</span>
                                     </div>
                                 )}
                                 {loyaltyDiscount > 0 && (
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">Points ({redeemingPoints.toLocaleString()})</span>
-                                        <span className="font-semibold text-new">−${loyaltyDiscount.toFixed(2)}</span>
+                                        <span className="font-semibold text-new">−{formatPrice(loyaltyDiscount, settings)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-500">Shipping</span>
-                                    <span className="font-semibold text-primary dark:text-white">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                                    <span className="font-semibold text-primary dark:text-white">{shipping === 0 ? 'Free' : formatPrice(shipping, settings)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-500">Tax</span>
-                                    <span className="font-semibold text-primary dark:text-white">${tax.toFixed(2)}</span>
+                                    <span className="font-semibold text-primary dark:text-white">{formatPrice(tax, settings)}</span>
                                 </div>
                                 <div className="flex justify-between items-center pt-3 border-t border-primary/10 dark:border-slate-800">
                                     <span className="text-sm font-bold text-primary dark:text-white">Total</span>
-                                    <span className="text-2xl md:text-3xl font-medium text-primary dark:text-white">${finalTotal.toFixed(2)}</span>
+                                    <span className="text-2xl md:text-3xl font-medium text-primary dark:text-white">{formatPrice(finalTotal, settings)}</span>
                                 </div>
                             </div>
 

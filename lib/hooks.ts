@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { api } from './api';
 import type { Product } from '@/store/useStore';
 import { defaultContent, type SiteContent } from './siteContent';
+import { useCurrencyStore } from '@/store/useCurrencyStore';
 
 export interface Category {
     id: number;
@@ -421,11 +422,55 @@ export interface Settings {
     taxRate: number;
     currencyCode: string;
     currencySymbol: string;
+    exchangeRate: number;
 }
 
 export function useSettings() {
     const { data, isLoading, mutate } = useSWR<{ data: Settings }>('/settings', fetcher);
     return { settings: data?.data, isLoading, mutate };
+}
+
+export interface CurrencyOption {
+    id: number;
+    code: string;
+    symbol: string;
+    label: string;
+    rate: number;
+    isDefault: boolean;
+}
+
+/** Admin-managed list of currencies (public read; create/edit/delete is admin-only). */
+export function useCurrencies() {
+    const { data, isLoading, mutate } = useSWR<{ data: CurrencyOption[] }>('/currencies', fetcher);
+    return { currencies: data?.data ?? [], isLoading, mutate };
+}
+
+/**
+ * Browsing-display currency: reflects the shopper's own currency picker choice
+ * (persisted locally), falling back to the store's configured currency until they
+ * pick one. This is for product/browsing pages only — checkout, cart totals, order
+ * history and the admin dashboard intentionally keep using `useSettings()` directly
+ * so the figures shown always match what's actually billed, in the store's real
+ * currency (no payment gateway here supports charging in an arbitrary currency).
+ */
+export function useDisplayCurrency() {
+    const { settings, isLoading } = useSettings();
+    const { currencies } = useCurrencies();
+    const selectedCode = useCurrencyStore((s) => s.selectedCode);
+
+    if (!settings) return { settings: undefined, isLoading };
+    const chosen = selectedCode ? currencies.find((c) => c.code === selectedCode) : undefined;
+    if (!chosen) return { settings, isLoading };
+
+    return {
+        settings: {
+            ...settings,
+            currencyCode: chosen.code,
+            currencySymbol: chosen.symbol,
+            exchangeRate: chosen.rate,
+        },
+        isLoading,
+    };
 }
 
 /** Editable site content (homepage copy, trust strip, promos, footer, pages). */

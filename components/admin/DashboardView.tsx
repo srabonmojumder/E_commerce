@@ -4,7 +4,8 @@ import Link from 'next/link';
 import {
     Package, CreditCard, BarChart3, Clock, Rocket, Users2, Star, ArrowUpRight, MoreHorizontal, ChevronsUpDown,
 } from 'lucide-react';
-import { type AdminDashboard } from '@/lib/hooks';
+import { type AdminDashboard, useSettings } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 /* The dashboard uses the reference's sky-blue accent (admin dashboard only). */
 const SKY = '#46AEE8';
@@ -160,6 +161,7 @@ function Heatmap({ cells, max }: { cells: AdminDashboard['heatmap']; max: number
 /* ============================ main view ============================ */
 export default function DashboardView({ data: d }: { data: AdminDashboard }) {
     const reviewTotal = Math.max(1, d.reviews.total);
+    const { settings } = useSettings();
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
@@ -200,7 +202,7 @@ export default function DashboardView({ data: d }: { data: AdminDashboard }) {
                                             </span>
                                         </td>
                                         <td className="py-3.5 text-slate-500 whitespace-nowrap">{new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                                        <td className="py-3.5 font-semibold text-slate-700 whitespace-nowrap">${o.total.toFixed(2)}</td>
+                                        <td className="py-3.5 font-semibold text-slate-700 whitespace-nowrap">{formatPrice(o.total, settings)}</td>
                                         <td className={`py-3.5 pr-5 md:pr-6 font-semibold whitespace-nowrap ${statusStyles(o.status)}`}>{o.status}</td>
                                     </tr>
                                 ))}
@@ -289,7 +291,7 @@ export default function DashboardView({ data: d }: { data: AdminDashboard }) {
                                     <p className="text-sm font-bold text-slate-700 truncate">{o.customer}</p>
                                     <p className="text-[11px] text-slate-400">{ago(o.createdAt)}</p>
                                 </div>
-                                <span className="text-sm font-black text-emerald-600 whitespace-nowrap">+ ${o.total.toFixed(2)}</span>
+                                <span className="text-sm font-black text-emerald-600 whitespace-nowrap">+ {formatPrice(o.total, settings)}</span>
                             </div>
                         ))}
                         {d.recentOrders.length === 0 && <p className="text-sm text-slate-400">No sales yet.</p>}

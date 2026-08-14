@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Printer, ArrowLeft } from 'lucide-react';
 import { useOrder, useSettings } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const fmtDate = (s: string) =>
@@ -16,8 +17,7 @@ export default function InvoicePage() {
     const { order, isLoading } = useOrder(authStatus === 'authenticated' ? id : null);
     const { settings } = useSettings();
 
-    const cur = settings?.currencySymbol ?? '$';
-    const money = (n: number) => `${cur}${n.toFixed(2)}`;
+    const money = (n: number) => formatPrice(n, settings);
 
     if (authStatus === 'loading' || (authStatus === 'authenticated' && isLoading)) {
         return <div className="min-h-[50vh] flex items-center justify-center"><div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" /></div>;

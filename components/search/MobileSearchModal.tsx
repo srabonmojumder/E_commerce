@@ -3,14 +3,16 @@
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Search, X, TrendingUp, Clock, Tag } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { useProducts, useCategories } from '@/lib/hooks';
+import { useProducts, useCategories, useDisplayCurrency } from '@/lib/hooks';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/store/useStore';
+import { formatPrice } from '@/lib/currency';
 
 export default function MobileSearchModal() {
     const { products } = useProducts();
     const { categories } = useCategories();
+    const { settings } = useDisplayCurrency();
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Product[]>([]);
@@ -183,7 +185,7 @@ export default function MobileSearchModal() {
                                                         </div>
                                                         <div className="flex flex-col items-end">
                                                             <span className="font-bold text-accent-600">
-                                                                ${product.price.toFixed(2)}
+                                                                {formatPrice(product.price, settings)}
                                                             </span>
                                                             {product.discount && (
                                                                 <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">

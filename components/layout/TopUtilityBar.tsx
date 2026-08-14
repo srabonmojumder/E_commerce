@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Phone, Mail, Facebook, Instagram, Twitter, User, Heart, MapPin } from 'lucide-react';
 import { useSettings } from '@/lib/hooks';
+import CurrencySelector from '@/components/ui/CurrencySelector';
 
 export default function TopUtilityBar() {
     const { settings } = useSettings();
@@ -42,10 +43,8 @@ export default function TopUtilityBar() {
 
                         <span className="hidden lg:block w-px h-3 bg-slate-700" />
 
-                        {/* Store currency (from admin settings) */}
-                        <span className="hidden sm:flex items-center gap-1 text-stone-400">
-                            {settings?.currencySymbol || '$'} {settings?.currencyCode || 'USD'}
-                        </span>
+                        {/* Currency picker — browsing display only, checkout always bills in the store's currency */}
+                        <CurrencySelector />
 
                         <span className="hidden sm:block w-px h-3 bg-slate-700" />
 

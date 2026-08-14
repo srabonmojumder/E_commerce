@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useAdminReturns, type AdminReturn } from '@/lib/hooks';
+import { useAdminReturns, useSettings, type AdminReturn } from '@/lib/hooks';
 import { api, ApiError } from '@/lib/api';
+import { formatPrice } from '@/lib/currency';
 import Select from '@/components/ui/Select';
 import { CardListSkeleton } from '@/components/ui/Skeleton';
 
@@ -23,6 +24,7 @@ function ReturnRow({ r, onChanged }: { r: AdminReturn; onChanged: () => void }) 
     const [status, setStatus] = useState<AdminReturn['status']>(r.status);
     const [note, setNote] = useState(r.adminNote ?? '');
     const [saving, setSaving] = useState(false);
+    const { settings } = useSettings();
 
     const save = async () => {
         setSaving(true);
@@ -47,7 +49,7 @@ function ReturnRow({ r, onChanged }: { r: AdminReturn; onChanged: () => void }) 
                         <span className="text-xs text-gray-400">{r.customer}</span>
                     </div>
                     <p className="text-sm text-secondary"><b>Reason:</b> {r.reason}</p>
-                    <p className="text-xs text-gray-400">Order total: ${r.orderTotal.toFixed(2)} · {new Date(r.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-400">Order total: {formatPrice(r.orderTotal, settings)} · {new Date(r.createdAt).toLocaleDateString()}</p>
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">

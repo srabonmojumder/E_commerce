@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { TrendingUp, ShoppingBag, DollarSign, BarChart3 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminAnalytics, useSettings, type AdminAnalytics } from '@/lib/hooks';
+import { convertPrice } from '@/lib/currency';
 import { StatCardsSkeleton, ChartSkeleton, BarListSkeleton } from '@/components/ui/Skeleton';
 
 const RANGES = [7, 30, 90] as const;
@@ -62,7 +63,7 @@ export default function AdminAnalyticsPage() {
     const { analytics, isLoading } = useAdminAnalytics(isAdmin, days);
     const { settings } = useSettings();
     const cur = settings?.currencySymbol ?? '$';
-    const money = (n: number) => `${cur}${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+    const money = (n: number) => `${cur}${convertPrice(n, settings).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 
     const topMax = Math.max(1, ...(analytics?.topProducts.map((p) => p.revenue) ?? [1]));
     const statusTotal = (analytics?.statusBreakdown ?? []).reduce((s, x) => s + x.count, 0) || 1;

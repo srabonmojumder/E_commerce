@@ -5,8 +5,9 @@ import { X, Search as SearchIcon, TrendingUp, Clock, Tag, Star } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useProducts, useCategories } from '@/lib/hooks';
+import { useProducts, useCategories, useDisplayCurrency } from '@/lib/hooks';
 import { Product } from '@/store/useStore';
+import { formatPrice } from '@/lib/currency';
 
 interface SearchModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const { products } = useProducts();
     const { categories } = useCategories();
+    const { settings } = useDisplayCurrency();
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Product[]>([]);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -177,13 +179,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                             </p>
                                                             <div className="flex items-center gap-2 mt-1">
                                                                 <span className="text-sm font-bold text-accent">
-                                                                    ${product.discount
-                                                                        ? (product.price * (1 - product.discount / 100)).toFixed(2)
-                                                                        : product.price.toFixed(2)}
+                                                                    {formatPrice(
+                                                                        product.discount
+                                                                            ? product.price * (1 - product.discount / 100)
+                                                                            : product.price,
+                                                                        settings
+                                                                    )}
                                                                 </span>
                                                                 {product.discount && (
                                                                     <span className="text-xs text-gray-400 line-through">
-                                                                        ${product.price.toFixed(2)}
+                                                                        {formatPrice(product.price, settings)}
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -362,9 +367,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                         </div>
                                                         <div className="flex flex-col items-end gap-1">
                                                             <span className="font-bold text-accent text-sm">
-                                                                ${product.discount
-                                                                    ? (product.price * (1 - product.discount / 100)).toFixed(2)
-                                                                    : product.price.toFixed(2)}
+                                                                {formatPrice(
+                                                                    product.discount
+                                                                        ? product.price * (1 - product.discount / 100)
+                                                                        : product.price,
+                                                                    settings
+                                                                )}
                                                             </span>
                                                             {product.discount && (
                                                                 <span className="text-[10px] bg-primary text-white px-1.5 py-0.5 rounded-full font-medium">

@@ -5,6 +5,7 @@ import { asyncHandler, HttpError } from '../middleware/error.js';
 import { stripe, isStripeConfigured } from '../lib/stripe.js';
 import { isSslcommerzConfigured, sslcommerzInit, sslcommerzValidate } from '../lib/sslcommerz.js';
 import { getSettings } from '../lib/settings.js';
+import { convertAmount } from '../lib/currency.js';
 import { env } from '../lib/env.js';
 
 const intentSchema = z.object({ orderId: z.number().int().positive() });
@@ -49,7 +50,7 @@ export const createPaymentIntent = asyncHandler(async (req: Request, res: Respon
 
   const settings = await getSettings();
   const intent = await stripe.paymentIntents.create({
-    amount: Math.round(Number(order.total) * 100),
+    amount: Math.round(convertAmount(Number(order.total), settings.exchangeRate) * 100),
     currency: (settings.currencyCode || 'USD').toLowerCase(),
     metadata: { orderId: String(order.id), userId: String(req.user!.sub) },
   });
@@ -104,7 +105,7 @@ export const initSslcommerz = asyncHandler(async (req: Request, res: Response) =
 
   const url = await sslcommerzInit({
     orderId: order.id,
-    amount: Number(order.total),
+    amount: convertAmount(Number(order.total), settings.exchangeRate),
     currency: settings.currencyCode || 'BDT',
     customer: { name: sa.fullName ?? '', email: order.email ?? '', phone: sa.phone },
     successUrl: `${cb}/success`,

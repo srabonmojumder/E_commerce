@@ -6,6 +6,8 @@ import { useStore } from '@/store/useStore';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { useSettings } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export default function FloatingCart() {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +18,7 @@ export default function FloatingCart() {
     const updateQuantity = useStore((state) => state.updateQuantity);
     const getTotalPrice = useStore((state) => state.getTotalPrice);
     const getTotalItems = useStore((state) => state.getTotalItems);
+    const { settings } = useSettings();
 
     useEffect(() => {
         setMounted(true);
@@ -136,7 +139,7 @@ export default function FloatingCart() {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-sm font-bold text-accent-600">
-                                                            ${(price * item.quantity).toFixed(2)}
+                                                            {formatPrice(price * item.quantity, settings)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -160,7 +163,7 @@ export default function FloatingCart() {
                                         Total:
                                     </span>
                                     <span className="text-2xl font-bold bg-gradient-to-r from-accent-600 to-pink-600 bg-clip-text text-transparent">
-                                        ${totalPrice.toFixed(2)}
+                                        {formatPrice(totalPrice, settings)}
                                     </span>
                                 </div>
 

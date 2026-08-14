@@ -159,7 +159,7 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
     const coupon = await prisma.coupon.findUnique({
       where: { code: parsed.data.couponCode.trim().toUpperCase() },
     });
-    const result = evaluateCoupon(coupon, subtotal);
+    const result = evaluateCoupon(coupon, subtotal, settings);
     if (!result.valid) throw new HttpError(400, result.message);
     discount = result.discount;
     appliedCoupon = { id: coupon!.id, code: coupon!.code };
@@ -286,6 +286,8 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
     orderId: order.id,
     total: Number(order.total),
     items: order.items.map((it) => ({ name: it.name, quantity: it.quantity })),
+    currencySymbol: settings.currencySymbol,
+    exchangeRate: settings.exchangeRate,
   });
 
   res.status(201).json({ data: serializeOrder(order) });

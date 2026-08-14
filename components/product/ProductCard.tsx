@@ -10,6 +10,8 @@ import { useCompareStore } from '@/store/useCompareStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import QuickViewModal from '@/components/product/QuickViewModal';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 interface ProductCardProps {
     product: Product;
@@ -22,6 +24,7 @@ export default function ProductCard({ product, onQuickView, variant = 'default' 
     const [imageLoaded, setImageLoaded] = useState(false);
     const [hasMounted, setHasMounted] = useState(false);
     const [quickViewOpen, setQuickViewOpen] = useState(false);
+    const { settings } = useDisplayCurrency();
 
     const handleQuickView = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -145,11 +148,11 @@ export default function ProductCard({ product, onQuickView, variant = 'default' 
                     <div className="flex items-center justify-between">
                         <div className="flex items-baseline gap-2">
                             <span className="text-primary dark:text-white font-sans font-medium text-sm md:text-[15px] tabular-nums">
-                                ${discountedPrice.toFixed(2)}
+                                {formatPrice(discountedPrice, settings)}
                             </span>
                             {product.discount && (
                                 <span className="text-secondary/60 dark:text-gray-500 text-xs line-through tabular-nums">
-                                    ${product.price.toFixed(2)}
+                                    {formatPrice(product.price, settings)}
                                 </span>
                             )}
                         </div>

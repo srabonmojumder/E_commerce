@@ -39,13 +39,14 @@ import {
     useCategories,
     usePublicStats,
     useTestimonials,
-    useSettings,
+    useDisplayCurrency,
     useContent,
     type Testimonial,
 } from '@/lib/hooks';
 import { iconByKey } from '@/lib/featureIcons';
 import { api } from '@/lib/api';
 import { generateWebSiteSchema } from '@/lib/seo';
+import { formatPrice } from '@/lib/currency';
 
 const FALLBACK_CAT_IMAGE = '/home_accessories_hero.png';
 
@@ -135,7 +136,7 @@ export default function Home() {
     const { products: newArrivals, isLoading: newLoading } = useNewArrivals(8);
     const { categories } = useCategories();
     const { stats } = usePublicStats();
-    const { settings } = useSettings();
+    const { settings } = useDisplayCurrency();
     const { content } = useContent();
     const c = content.homepage;
     const { testimonials } = useTestimonials(8);
@@ -236,12 +237,11 @@ export default function Home() {
 
     // Trust strip — admin-managed cards; first card's blank desc falls back to
     // the live free-shipping threshold from store settings.
-    const currencySymbol = settings?.currencySymbol ?? '$';
     const freeShipThreshold = settings?.freeShippingThreshold ?? 75;
     const features = content.features.map((f, i) => ({
         icon: iconByKey[f.icon] ?? Truck,
         title: f.title,
-        desc: f.desc || (i === 0 ? `Orders over ${currencySymbol}${freeShipThreshold}` : ''),
+        desc: f.desc || (i === 0 ? `Orders over ${formatPrice(freeShipThreshold, settings)}` : ''),
     }));
 
     const statItems = [
@@ -552,8 +552,8 @@ export default function Home() {
                         <div className="flex flex-wrap gap-8 items-center">
                             {dealProduct ? (
                                 <div className="flex flex-col">
-                                    <span className="text-gray-400 text-sm font-bold line-through">${dealOriginal.toFixed(2)}</span>
-                                    <span className="text-4xl md:text-5xl font-medium text-primary dark:text-white">${dealNow.toFixed(2)}</span>
+                                    <span className="text-gray-400 text-sm font-bold line-through">{formatPrice(dealOriginal, settings)}</span>
+                                    <span className="text-4xl md:text-5xl font-medium text-primary dark:text-white">{formatPrice(dealNow, settings)}</span>
                                 </div>
                             ) : (
                                 <div className="flex flex-col">

@@ -333,6 +333,20 @@ model WishlistItem {
   @@index([productId])
 }
 
+/// Admin-managed list of currencies. `isDefault` marks the store's real
+/// settlement currency — kept in sync with `Setting.currencyCode/currencySymbol/exchangeRate`
+/// whenever it changes, so existing checkout/payment code (which reads Setting) stays correct.
+model Currency {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  symbol    String
+  label     String
+  rate      Float // 1 USD = `rate` units of this currency
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // ----------------------------- Store config / marketing -----------------------------
 
 // Singleton row (id = 1) holding store-wide settings the admin can edit.
@@ -351,6 +365,8 @@ model Setting {
   taxRate               Float    @default(0.08)
   currencyCode          String   @default("USD")
   currencySymbol        String   @default("$")
+  // Prices are stored in USD; display/charge amounts multiply by this rate.
+  exchangeRate          Float    @default(1)
   updatedAt             DateTime @updatedAt
 }
 

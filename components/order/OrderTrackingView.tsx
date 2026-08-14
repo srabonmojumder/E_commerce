@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import { Check, Clock, CreditCard, Package, Truck, Home, XCircle, MapPin } from 'lucide-react';
+import { useSettings } from '@/lib/hooks';
 import type { Order } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 const STEPS = [
     { key: 'PENDING', label: 'Placed', icon: Clock },
@@ -19,6 +21,7 @@ export default function OrderTrackingView({ order }: { order: Order }) {
     const addr = order.shippingAddress as Record<string, string>;
     const cancelled = order.status === 'CANCELLED' || order.status === 'REFUNDED';
     const currentIndex = STEPS.findIndex((s) => s.key === order.status);
+    const { settings } = useSettings();
 
     return (
         <div className="space-y-8">
@@ -99,15 +102,15 @@ export default function OrderTrackingView({ order }: { order: Order }) {
                                 <p className="text-sm font-semibold text-primary dark:text-white truncate">{it.name}</p>
                                 <p className="text-xs text-gray-400">Qty: {it.quantity}</p>
                             </div>
-                            <span className="text-sm font-bold text-primary dark:text-white">${(it.price * it.quantity).toFixed(2)}</span>
+                            <span className="text-sm font-bold text-primary dark:text-white">{formatPrice(it.price * it.quantity, settings)}</span>
                         </div>
                     ))}
                     <div className="pt-3 border-t border-primary/10 dark:border-slate-800 space-y-1.5 text-sm">
-                        <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>${order.subtotal.toFixed(2)}</span></div>
-                        {order.discount > 0 && <div className="flex justify-between text-new"><span>Discount{order.couponCode ? ` (${order.couponCode})` : ''}</span><span>−${order.discount.toFixed(2)}</span></div>}
-                        <div className="flex justify-between text-gray-500"><span>Shipping</span><span>{order.shipping === 0 ? 'Free' : `$${order.shipping.toFixed(2)}`}</span></div>
-                        <div className="flex justify-between text-gray-500"><span>Tax</span><span>${order.tax.toFixed(2)}</span></div>
-                        <div className="flex justify-between font-medium text-primary dark:text-white text-lg pt-1.5 border-t border-primary/10 dark:border-slate-800"><span>Total</span><span>${order.total.toFixed(2)}</span></div>
+                        <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>{formatPrice(order.subtotal, settings)}</span></div>
+                        {order.discount > 0 && <div className="flex justify-between text-new"><span>Discount{order.couponCode ? ` (${order.couponCode})` : ''}</span><span>−{formatPrice(order.discount, settings)}</span></div>}
+                        <div className="flex justify-between text-gray-500"><span>Shipping</span><span>{order.shipping === 0 ? 'Free' : formatPrice(order.shipping, settings)}</span></div>
+                        <div className="flex justify-between text-gray-500"><span>Tax</span><span>{formatPrice(order.tax, settings)}</span></div>
+                        <div className="flex justify-between font-medium text-primary dark:text-white text-lg pt-1.5 border-t border-primary/10 dark:border-slate-800"><span>Total</span><span>{formatPrice(order.total, settings)}</span></div>
                     </div>
                 </div>
 

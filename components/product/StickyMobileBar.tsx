@@ -6,6 +6,8 @@ import { Product, useStore } from '@/store/useStore';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 interface StickyMobileBarProps {
     product: Product;
@@ -21,6 +23,7 @@ export default function StickyMobileBar({ product }: StickyMobileBarProps) {
     const addToWishlist = useStore((state) => state.addToWishlist);
     const removeFromWishlist = useStore((state) => state.removeFromWishlist);
     const isInWishlist = useStore((state) => state.isInWishlist);
+    const { settings } = useDisplayCurrency();
 
     // Only check wishlist after component is mounted to prevent hydration mismatch
     const inWishlist = mounted ? isInWishlist(product.id) : false;
@@ -117,11 +120,11 @@ export default function StickyMobileBar({ product }: StickyMobileBarProps) {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-baseline gap-1.5 sm:gap-2">
                                     <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-accent-600 to-pink-600 bg-clip-text text-transparent">
-                                        ${discountedPrice.toFixed(2)}
+                                        {formatPrice(discountedPrice, settings)}
                                     </span>
                                     {product.discount && (
                                         <span className="text-xs sm:text-sm text-gray-400 line-through">
-                                            ${product.price.toFixed(2)}
+                                            {formatPrice(product.price, settings)}
                                         </span>
                                     )}
                                 </div>

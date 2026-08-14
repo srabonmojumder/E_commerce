@@ -7,10 +7,12 @@ import ProductCard from '@/components/product/ProductCard';
 import QuickFilters from '@/components/ui/QuickFilters';
 import SortDropdown from '@/components/ui/SortDropdown';
 import ProductGridSkeleton from '@/components/product/ProductGridSkeleton';
-import { useProducts, useCategory } from '@/lib/hooks';
+import { useProducts, useCategory, useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export default function ProductsPage() {
     const { products, isLoading: productsLoading } = useProducts();
+    const { settings } = useDisplayCurrency();
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [categoryParam, setCategoryParam] = useState<string | null>(null);
 
@@ -127,7 +129,7 @@ export default function ProductsPage() {
                     />
                     <div className="flex justify-between items-center px-4 lg:px-6 py-4 lg:py-5 bg-primary dark:bg-ink-900 text-white rounded-2xl shadow-xl border border-primary/5 dark:border-slate-800">
                         <span className="text-[10px] font-medium tracking-widest uppercase opacity-60">Max Price</span>
-                        <span className="text-xl lg:text-2xl font-medium">${priceRange[1]}</span>
+                        <span className="text-xl lg:text-2xl font-medium">{formatPrice(priceRange[1], settings)}</span>
                     </div>
                 </div>
             </div>

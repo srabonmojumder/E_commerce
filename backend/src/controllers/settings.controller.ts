@@ -25,6 +25,7 @@ const updateSchema = z
     taxRate: z.number().min(0).max(1),
     currencyCode: z.string().min(1),
     currencySymbol: z.string().min(1),
+    exchangeRate: z.number().positive(),
   })
   .partial();
 

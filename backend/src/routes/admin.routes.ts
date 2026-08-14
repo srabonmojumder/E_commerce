@@ -38,6 +38,12 @@ import {
   adminListBanners,
   adminUpdateBanner,
 } from '../controllers/banners.controller.js';
+import {
+  adminCreateCurrency,
+  adminDeleteCurrency,
+  adminSetDefaultCurrency,
+  adminUpdateCurrency,
+} from '../controllers/currencies.controller.js';
 import { adminDeleteSubscriber, adminListSubscribers } from '../controllers/newsletter.controller.js';
 import {
   adminCreatePost,
@@ -61,6 +67,12 @@ router.get('/coupons', adminListCoupons);
 router.post('/coupons', adminCreateCoupon);
 router.patch('/coupons/:id', adminUpdateCoupon);
 router.delete('/coupons/:id', adminDeleteCoupon);
+
+// Currencies
+router.post('/currencies', adminCreateCurrency);
+router.patch('/currencies/:id', adminUpdateCurrency);
+router.delete('/currencies/:id', adminDeleteCurrency);
+router.post('/currencies/:id/default', adminSetDefaultCurrency);
 
 // Banners
 router.get('/banners', adminListBanners);

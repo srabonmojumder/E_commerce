@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes';
 import {
     LayoutDashboard, BarChart3, Package, Tag, ClipboardList, RotateCcw, Users, Star,
     Ticket, Image as ImageIcon, BookOpen, LayoutTemplate, Mail, Settings as SettingsIcon, Store, LogOut,
-    Search, Bell, X, Menu, PanelLeftClose, PanelLeftOpen, Sun, Moon, UserCircle,
+    Search, Bell, X, Menu, PanelLeftClose, PanelLeftOpen, Sun, Moon, UserCircle, Banknote,
 } from 'lucide-react';
 
 const SKY = '#46AEE8';
@@ -25,6 +25,7 @@ const nav = [
     { href: '/admin/blog', label: 'Blog', icon: BookOpen },
     { href: '/admin/content', label: 'Content', icon: LayoutTemplate },
     { href: '/admin/newsletter', label: 'Newsletter', icon: Mail },
+    { href: '/admin/currencies', label: 'Currencies', icon: Banknote },
     { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
     { href: '/admin/profile', label: 'Profile', icon: UserCircle },
 ];

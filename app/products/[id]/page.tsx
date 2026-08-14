@@ -17,6 +17,17 @@ async function fetchProduct(slug: string): Promise<Product | null> {
     }
 }
 
+async function fetchCurrency(): Promise<{ currencyCode: string; exchangeRate: number }> {
+    try {
+        const res = await fetch(`${API_URL}/settings`, { next: { revalidate: 300 } });
+        if (!res.ok) throw new Error('failed');
+        const json = await res.json();
+        return { currencyCode: json.data.currencyCode, exchangeRate: json.data.exchangeRate };
+    } catch {
+        return { currencyCode: 'USD', exchangeRate: 1 };
+    }
+}
+
 export async function generateMetadata({
     params,
 }: {
@@ -63,14 +74,14 @@ export async function generateMetadata({
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const product = await fetchProduct(id);
+    const [product, currency] = await Promise.all([fetchProduct(id), fetchCurrency()]);
 
     return (
         <>
             {product && (
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(generateProductSchema(product)) }}
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(generateProductSchema(product, currency)) }}
                 />
             )}
             <ProductDetailClient />

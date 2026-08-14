@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { Plus, Pencil, Trash2, X, CheckSquare, Square } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useAdminProducts, useCategories, type AdminProduct, type Category } from '@/lib/hooks';
+import { useAdminProducts, useCategories, useSettings, useCurrencies, type AdminProduct, type Category, type CurrencyOption } from '@/lib/hooks';
 import { api, ApiError } from '@/lib/api';
+import { formatPrice } from '@/lib/currency';
 import MultiImageUpload from '@/components/admin/MultiImageUpload';
 import Select from '@/components/ui/Select';
 import { usePagination } from '@/lib/usePagination';
@@ -18,6 +19,7 @@ interface ProductFormState {
     name: string;
     description: string;
     price: string;
+    currencyCode: string;
     discount: string;
     image: string;
     images: string[];
@@ -28,13 +30,15 @@ interface ProductFormState {
 }
 
 const emptyProduct: ProductFormState = {
-    name: '', description: '', price: '', discount: '0', image: '', images: [], stock: '0', categoryId: '', tags: '', featured: false,
+    name: '', description: '', price: '', currencyCode: 'USD', discount: '0', image: '', images: [], stock: '0', categoryId: '', tags: '', featured: false,
 };
 
 export default function AdminProductsPage() {
     const isAdmin = useAuthStore((s) => s.status === 'authenticated' && s.user?.role === 'ADMIN');
     const { products, isLoading, mutate } = useAdminProducts(isAdmin);
     const { categories } = useCategories();
+    const { settings } = useSettings();
+    const { currencies } = useCurrencies();
     const [editing, setEditing] = useState<ProductFormState | null>(null);
     const [search, setSearch] = useState('');
     const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -75,12 +79,17 @@ export default function AdminProductsPage() {
         }
     };
 
-    const openNew = () => setEditing({ ...emptyProduct, categoryId: String(categories[0]?.id ?? '') });
+    const openNew = () => setEditing({
+        ...emptyProduct,
+        categoryId: String(categories[0]?.id ?? ''),
+        currencyCode: settings?.currencyCode ?? 'USD',
+    });
     const openEdit = (p: AdminProduct) => setEditing({
         id: p.id,
         name: p.name,
         description: '',
         price: String(Number(p.price)),
+        currencyCode: 'USD', // stored price is always USD; switch currency to re-enter in another one
         discount: String(p.discount),
         image: p.image,
         images: p.images?.length ? p.images.map((i) => i.url) : (p.image ? [p.image] : []),
@@ -169,7 +178,7 @@ export default function AdminProductsPage() {
                                     </td>
                                     <td className="p-4 font-semibold max-w-[220px] truncate">{p.name}</td>
                                     <td className="p-4 text-gray-500">{p.category?.name ?? '—'}</td>
-                                    <td className="p-4">${Number(p.price).toFixed(2)}</td>
+                                    <td className="p-4">{formatPrice(Number(p.price), settings)}</td>
                                     <td className="p-4">{p.stock}</td>
                                     <td className="p-4">{p.isActive ? '✓' : '—'}</td>
                                     <td className="p-4">
@@ -191,6 +200,7 @@ export default function AdminProductsPage() {
                 <ProductModal
                     state={editing}
                     categories={categories}
+                    currencies={currencies}
                     onClose={() => setEditing(null)}
                     onSaved={() => { setEditing(null); mutate(); }}
                 />
@@ -199,9 +209,10 @@ export default function AdminProductsPage() {
     );
 }
 
-function ProductModal({ state, categories, onClose, onSaved }: {
+function ProductModal({ state, categories, currencies, onClose, onSaved }: {
     state: ProductFormState;
     categories: Category[];
+    currencies: CurrencyOption[];
     onClose: () => void;
     onSaved: () => void;
 }) {
@@ -221,6 +232,7 @@ function ProductModal({ state, categories, onClose, onSaved }: {
             name: form.name,
             description: form.description || form.name,
             price: Number(form.price),
+            currencyCode: form.currencyCode,
             discount: Number(form.discount) || 0,
             image: form.images[0],
             images: form.images,
@@ -254,7 +266,19 @@ function ProductModal({ state, categories, onClose, onSaved }: {
                     <input className={field} placeholder="Name" required value={form.name} onChange={(e) => set('name', e.target.value)} />
                     <textarea className={field} placeholder="Description" rows={3} value={form.description} onChange={(e) => set('description', e.target.value)} />
                     <div className="grid grid-cols-2 gap-4">
-                        <input className={field} type="number" step="0.01" placeholder="Price" required value={form.price} onChange={(e) => set('price', e.target.value)} />
+                        <div className="flex gap-2">
+                            <input className={field} type="number" step="0.01" placeholder="Price" required value={form.price} onChange={(e) => set('price', e.target.value)} />
+                            <select
+                                className="px-3 bg-gray-50 rounded-[5px] focus:outline-none focus:ring-2 focus:ring-[#46AEE8] text-gray-900 text-sm"
+                                value={form.currencyCode}
+                                onChange={(e) => set('currencyCode', e.target.value)}
+                                title="Currency this price is entered in — converted to USD on save"
+                            >
+                                {currencies.map((c) => (
+                                    <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
+                                ))}
+                            </select>
+                        </div>
                         <input className={field} type="number" placeholder="Discount %" value={form.discount} onChange={(e) => set('discount', e.target.value)} />
                         <input className={field} type="number" placeholder="Stock" value={form.stock} onChange={(e) => set('stock', e.target.value)} />
                         <Select

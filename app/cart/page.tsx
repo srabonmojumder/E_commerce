@@ -7,6 +7,8 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, ArrowLeft, Truck, Shield,
 import { useStore, type Product } from '@/store/useStore';
 import { toast } from 'sonner';
 import RecommendedProducts from '@/components/product/RecommendedProducts';
+import { useSettings } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export default function CartPage() {
     const cart = useStore((state) => state.cart);
@@ -16,6 +18,7 @@ export default function CartPage() {
     const clearCart = useStore((state) => state.clearCart);
     const addToWishlist = useStore((state) => state.addToWishlist);
     const isInWishlist = useStore((state) => state.isInWishlist);
+    const { settings } = useSettings();
 
     /** Move a cart line to the wishlist (idempotent on the wishlist side). */
     const saveForLater = (item: Product) => {
@@ -115,7 +118,7 @@ export default function CartPage() {
                                             <Truck className="w-5 h-5 text-accent" />
                                         </div>
                                         <span className="text-sm font-medium tracking-widest text-primary uppercase">
-                                            Add <span className="text-accent">${(50 - totalPrice).toFixed(2)}</span> for FREE shipping
+                                            Add <span className="text-accent">{formatPrice(50 - totalPrice, settings)}</span> for FREE shipping
                                         </span>
                                     </div>
                                     <span className="text-xs font-medium text-primary">{Math.round(freeShippingProgress)}%</span>
@@ -217,11 +220,11 @@ export default function CartPage() {
                                                     {/* Price - Bold and Clean */}
                                                     <div className="text-right">
                                                         <div className="text-lg sm:text-2xl font-medium text-primary dark:text-white">
-                                                            ${(discountedPrice * item.quantity).toFixed(2)}
+                                                            {formatPrice(discountedPrice * item.quantity, settings)}
                                                         </div>
                                                         {item.discount && (
                                                             <div className="text-xs sm:text-sm text-gray-400 line-through font-bold">
-                                                                ${(item.price * item.quantity).toFixed(2)}
+                                                                {formatPrice(item.price * item.quantity, settings)}
                                                             </div>
                                                         )}
                                                     </div>
@@ -263,25 +266,25 @@ export default function CartPage() {
                                         <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500">Subtotal</span>
                                     </div>
                                     <span className="text-lg font-medium text-primary dark:text-white">
-                                        ${totalPrice.toFixed(2)}
+                                        {formatPrice(totalPrice, settings)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center px-6">
                                     <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500">Shipping</span>
                                     <span className={`text-sm font-medium uppercase tracking-widest ${shipping === 0 ? 'text-accent' : 'text-primary dark:text-white'}`}>
-                                        {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                                        {shipping === 0 ? 'Free' : formatPrice(shipping, settings)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center px-6 pb-6 border-b border-primary/5 dark:border-white/5">
                                     <span className="text-[10px] font-medium uppercase tracking-widest text-gray-500">Tax</span>
                                     <span className="text-sm font-medium text-primary dark:text-white">
-                                        ${tax.toFixed(2)}
+                                        {formatPrice(tax, settings)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center px-6 pt-4">
                                     <span className="text-xl font-medium text-primary dark:text-white tracking-tight">Total</span>
                                     <span className="text-3xl font-medium text-primary dark:text-white tracking-tight">
-                                        ${finalTotal.toFixed(2)}
+                                        {formatPrice(finalTotal, settings)}
                                     </span>
                                 </div>
                             </div>
@@ -321,7 +324,7 @@ export default function CartPage() {
                     <div>
                         <p className="text-[10px] font-medium uppercase tracking-widest text-gray-400 mb-1">Total Amount</p>
                         <p className="text-3xl font-medium text-primary dark:text-white tracking-tight">
-                            ${finalTotal.toFixed(2)}
+                            {formatPrice(finalTotal, settings)}
                         </p>
                     </div>
                     <Link href="/checkout" className="flex-1 max-w-[200px]">

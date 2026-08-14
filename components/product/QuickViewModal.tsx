@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Product } from '@/store/useStore';
 import { useStore } from '@/store/useStore';
 import { toast } from 'sonner';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 interface QuickViewModalProps {
     product: Product | null;
@@ -16,6 +18,7 @@ interface QuickViewModalProps {
 export default function QuickViewModal({ product, isOpen, onClose }: QuickViewModalProps) {
     const addToCart = useStore((state) => state.addToCart);
     const addToWishlist = useStore((state) => state.addToWishlist);
+    const { settings } = useDisplayCurrency();
 
     if (!product) return null;
 
@@ -113,15 +116,15 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                                             {product.discount ? (
                                                 <>
                                                     <span className="text-3xl font-bold text-accent-600">
-                                                        ${discountedPrice.toFixed(2)}
+                                                        {formatPrice(discountedPrice, settings)}
                                                     </span>
                                                     <span className="text-xl text-gray-400 line-through">
-                                                        ${product.price.toFixed(2)}
+                                                        {formatPrice(product.price, settings)}
                                                     </span>
                                                 </>
                                             ) : (
                                                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                                    ${product.price.toFixed(2)}
+                                                    {formatPrice(product.price, settings)}
                                                 </span>
                                             )}
                                         </div>

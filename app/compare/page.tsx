@@ -5,11 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { X, Check, Scale, ArrowRight } from 'lucide-react';
 import { useCompareStore } from '@/store/useCompareStore';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export default function ComparePage() {
     const compareProducts = useCompareStore((state) => state.compareProducts);
     const removeFromCompare = useCompareStore((state) => state.removeFromCompare);
     const clearCompare = useCompareStore((state) => state.clearCompare);
+    const { settings } = useDisplayCurrency();
 
     if (compareProducts.length === 0) {
         return (
@@ -46,7 +49,7 @@ export default function ComparePage() {
         {
             label: 'Price',
             render: (p) => (
-                <div className="text-xl font-medium text-accent">${p.price.toFixed(2)}</div>
+                <div className="text-xl font-medium text-accent">{formatPrice(p.price, settings)}</div>
             ),
         },
         {

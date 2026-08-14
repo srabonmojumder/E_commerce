@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { ChevronDown, X, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useAdminOrders, type AdminOrder } from '@/lib/hooks';
+import { useAdminOrders, useSettings, type AdminOrder } from '@/lib/hooks';
 import { api, ApiError } from '@/lib/api';
+import { formatPrice } from '@/lib/currency';
 import Select from '@/components/ui/Select';
 import { usePagination } from '@/lib/usePagination';
 import Pagination from '@/components/ui/Pagination';
@@ -26,6 +27,7 @@ const statusBadge = (s: string): string => ({
 export default function AdminOrdersPage() {
     const isAdmin = useAuthStore((s) => s.status === 'authenticated' && s.user?.role === 'ADMIN');
     const { orders, isLoading, mutate } = useAdminOrders(isAdmin);
+    const { settings } = useSettings();
     const [expanded, setExpanded] = useState<number | null>(null);
     const [managing, setManaging] = useState<AdminOrder | null>(null);
     const [search, setSearch] = useState('');
@@ -93,7 +95,7 @@ export default function AdminOrdersPage() {
                                                         </div>
                                                     </button>
                                                     <div className="flex items-center gap-3 flex-shrink-0">
-                                                        <span className="hidden sm:inline font-bold text-primary">${Number(o.total).toFixed(2)}</span>
+                                                        <span className="hidden sm:inline font-bold text-primary">{formatPrice(Number(o.total), settings)}</span>
                                                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${statusBadge(o.status)}`}>{o.status}</span>
                                                         <button onClick={() => setManaging(o)} className="px-3 py-1.5 bg-[#46AEE8] text-white rounded-lg text-xs font-bold">Manage</button>
                                                     </div>

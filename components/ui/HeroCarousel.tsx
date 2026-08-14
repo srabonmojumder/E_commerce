@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export interface Slide {
     id: number;
@@ -79,6 +81,7 @@ export default function HeroCarousel({ slides: slidesProp }: HeroCarouselProps =
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [direction, setDirection] = useState(0);
+    const { settings } = useDisplayCurrency();
 
     const nextSlide = useCallback(() => {
         setDirection(1);
@@ -226,10 +229,10 @@ export default function HeroCarousel({ slides: slidesProp }: HeroCarouselProps =
                                 className="flex items-end gap-4 justify-center lg:justify-start mb-7"
                             >
                                 <span className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-white tabular-nums leading-none">
-                                    ${slide.salePrice.toFixed(2)}
+                                    {formatPrice(slide.salePrice, settings)}
                                 </span>
                                 <span className="text-lg sm:text-xl text-white/40 line-through font-bold tabular-nums">
-                                    ${slide.originalPrice.toFixed(2)}
+                                    {formatPrice(slide.originalPrice, settings)}
                                 </span>
                                 <span className="px-2.5 py-1 bg-hot text-white text-[10px] font-medium uppercase tracking-widest rounded-md">
                                     −{slide.discount}%

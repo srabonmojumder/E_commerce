@@ -7,12 +7,15 @@ import { useCompareStore } from '@/store/useCompareStore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 export default function MobileComparisonSheet() {
     const [isOpen, setIsOpen] = useState(false);
     const compareProducts = useCompareStore((state) => state.compareProducts);
     const removeFromCompare = useCompareStore((state) => state.removeFromCompare);
     const clearCompare = useCompareStore((state) => state.clearCompare);
+    const { settings } = useDisplayCurrency();
 
     if (compareProducts.length === 0) return null;
 
@@ -131,7 +134,7 @@ export default function MobileComparisonSheet() {
                                                             {row.type === 'price' && (
                                                                 <div className="space-y-1">
                                                                     <span className="text-lg font-bold text-accent-600">
-                                                                        ${product.price.toFixed(2)}
+                                                                        {formatPrice(product.price, settings)}
                                                                     </span>
                                                                     {product.discount && (
                                                                         <div className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full inline-block">

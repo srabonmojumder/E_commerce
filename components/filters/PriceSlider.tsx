@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useDisplayCurrency } from '@/lib/hooks';
+import { formatPrice } from '@/lib/currency';
 
 interface PriceSliderProps {
     min: number;
@@ -10,6 +12,7 @@ interface PriceSliderProps {
 }
 
 export default function PriceSlider({ min, max, value, onChange }: PriceSliderProps) {
+    const { settings } = useDisplayCurrency();
     const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newMin = parseInt(e.target.value);
         if (newMin < value[1]) {
@@ -67,11 +70,11 @@ export default function PriceSlider({ min, max, value, onChange }: PriceSliderPr
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Min:</span>
-                    <span className="text-lg font-bold text-accent-600">${value[0]}</span>
+                    <span className="text-lg font-bold text-accent-600">{formatPrice(value[0], settings)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Max:</span>
-                    <span className="text-lg font-bold text-pink-600">${value[1]}</span>
+                    <span className="text-lg font-bold text-pink-600">{formatPrice(value[1], settings)}</span>
                 </div>
             </div>
         </div>

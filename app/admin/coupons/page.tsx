@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useAdminCoupons } from '@/lib/hooks';
+import { useAdminCoupons, useSettings } from '@/lib/hooks';
 import { api, ApiError } from '@/lib/api';
+import { formatPrice } from '@/lib/currency';
 import Select from '@/components/ui/Select';
 import { usePagination } from '@/lib/usePagination';
 import Pagination from '@/components/ui/Pagination';
@@ -17,6 +18,7 @@ const field = 'w-full px-4 py-3 bg-gray-50 rounded-[5px] focus:outline-none focu
 export default function AdminCouponsPage() {
     const isAdmin = useAuthStore((s) => s.status === 'authenticated' && s.user?.role === 'ADMIN');
     const { coupons, isLoading, mutate } = useAdminCoupons(isAdmin);
+    const { settings } = useSettings();
     const { page, setPage, totalPages, total, start, end, pageItems } = usePagination(coupons);
     const [form, setForm] = useState({ code: '', type: 'PERCENT', value: '', minSubtotal: '0', maxUses: '' });
     const [saving, setSaving] = useState(false);
@@ -88,8 +90,8 @@ export default function AdminCouponsPage() {
                             {pageItems.map((c) => (
                                 <tr key={c.id} className="text-primary">
                                     <td className="p-4 font-bold">{c.code}</td>
-                                    <td className="p-4">{c.type === 'PERCENT' ? `${c.value}%` : `$${c.value}`}</td>
-                                    <td className="p-4">${c.minSubtotal}</td>
+                                    <td className="p-4">{c.type === 'PERCENT' ? `${c.value}%` : formatPrice(c.value, settings)}</td>
+                                    <td className="p-4">{formatPrice(c.minSubtotal, settings)}</td>
                                     <td className="p-4">{c.usedCount}{c.maxUses ? ` / ${c.maxUses}` : ''}</td>
                                     <td className="p-4">
                                         <button onClick={() => toggle(c.id, c.active)} className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${c.active ? 'bg-new/10 text-new' : 'bg-gray-100 text-gray-400'}`}>{c.active ? 'Active' : 'Off'}</button>

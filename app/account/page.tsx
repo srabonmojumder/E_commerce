@@ -13,9 +13,10 @@ import SecurityForm from '@/components/account/SecurityForm';
 import EmailVerifyBanner from '@/components/account/EmailVerifyBanner';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useStore, type Product } from '@/store/useStore';
-import { useOrders, useLoyalty, type Order } from '@/lib/hooks';
+import { useOrders, useLoyalty, useSettings, type Order } from '@/lib/hooks';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -40,6 +41,7 @@ export default function AccountPage() {
     const { orders, isLoading: ordersLoading } = useOrders(isAuthed);
     const { loyalty } = useLoyalty(isAuthed);
     const addToCart = useStore((s) => s.addToCart);
+    const { settings } = useSettings();
 
     /** Re-add every item from a past order to the cart (skips items missing image/slug). */
     const orderAgain = (order: Order) => {
@@ -221,7 +223,7 @@ export default function AccountPage() {
                                                             <span className="text-[10px] font-medium text-accent uppercase tracking-widest underline underline-offset-4">LC-{String(order.id).padStart(4, '0')}</span>
                                                             <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{formatDate(order.createdAt)}</span>
                                                         </div>
-                                                        <h3 className="text-3xl font-medium text-primary dark:text-white tracking-tight uppercase">Total: ${order.total.toFixed(2)}</h3>
+                                                        <h3 className="text-3xl font-medium text-primary dark:text-white tracking-tight uppercase">Total: {formatPrice(order.total, settings)}</h3>
                                                         <p className="text-[10px] font-medium text-secondary dark:text-gray-400 uppercase tracking-[0.2em]">{order.items.reduce((n, it) => n + it.quantity, 0)} Units</p>
                                                     </div>
                                                     <div className="flex flex-wrap items-center gap-3">

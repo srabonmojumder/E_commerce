@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { asyncHandler, HttpError } from '../middleware/error.js';
 import { evaluateCoupon } from '../lib/coupon.js';
+import { getSettings } from '../lib/settings.js';
 
 const validateSchema = z.object({
   code: z.string().min(1),
@@ -15,7 +16,8 @@ export const validateCoupon = asyncHandler(async (req: Request, res: Response) =
   if (!parsed.success) throw new HttpError(400, 'Invalid input', parsed.error.flatten().fieldErrors);
 
   const coupon = await prisma.coupon.findUnique({ where: { code: parsed.data.code.trim().toUpperCase() } });
-  const result = evaluateCoupon(coupon, parsed.data.subtotal);
+  const settings = await getSettings();
+  const result = evaluateCoupon(coupon, parsed.data.subtotal, settings);
   res.json({
     valid: result.valid,
     discount: result.discount,

@@ -9,10 +9,12 @@ const SITE_DESCRIPTION = 'Premium e-commerce experience for modern home accessor
  * Generate Product JSON-LD structured data
  * For rich snippets in search results
  */
-export function generateProductSchema(product: Product) {
-  const finalPrice = product.discount
-    ? (product.price * (1 - product.discount / 100)).toFixed(2)
-    : product.price.toFixed(2);
+export function generateProductSchema(
+  product: Product,
+  currency: { currencyCode: string; exchangeRate: number } = { currencyCode: 'USD', exchangeRate: 1 }
+) {
+  const basePrice = product.discount ? product.price * (1 - product.discount / 100) : product.price;
+  const finalPrice = (basePrice * currency.exchangeRate).toFixed(2);
 
   return {
     '@context': 'https://schema.org',
@@ -28,7 +30,7 @@ export function generateProductSchema(product: Product) {
     offers: {
       '@type': 'Offer',
       url: `${SITE_URL}/products/${product.id}`,
-      priceCurrency: 'USD',
+      priceCurrency: currency.currencyCode,
       price: finalPrice,
       priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 90 days from now
       availability: product.inStock
@@ -118,7 +120,10 @@ export function generateBreadcrumbSchema(
  * Generate ItemList JSON-LD structured data
  * For product listings
  */
-export function generateItemListSchema(products: Product[]) {
+export function generateItemListSchema(
+  products: Product[],
+  currency: { currencyCode: string; exchangeRate: number } = { currencyCode: 'USD', exchangeRate: 1 }
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -132,10 +137,11 @@ export function generateItemListSchema(products: Product[]) {
         image: `${SITE_URL}${product.image}`,
         offers: {
           '@type': 'Offer',
-          price: product.discount
-            ? (product.price * (1 - product.discount / 100)).toFixed(2)
-            : product.price.toFixed(2),
-          priceCurrency: 'USD',
+          price: (
+            (product.discount ? product.price * (1 - product.discount / 100) : product.price) *
+            currency.exchangeRate
+          ).toFixed(2),
+          priceCurrency: currency.currencyCode,
         },
       },
     })),

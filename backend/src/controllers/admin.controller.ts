@@ -27,12 +27,23 @@ async function setProductTags(productId: number, tagNames: string[]) {
   }
 }
 
+/** Converts a price entered in `currencyCode` to USD (products are always stored in USD). */
+async function toUsd(price: number, currencyCode: string | undefined): Promise<number> {
+  if (!currencyCode || currencyCode.toUpperCase() === 'USD') return price;
+  const currency = await prisma.currency.findUnique({ where: { code: currencyCode.toUpperCase() } });
+  if (!currency) throw new HttpError(400, `Unknown currency ${currencyCode}`);
+  return Math.round((price / currency.rate) * 100) / 100;
+}
+
 // ---------------- Products ----------------
 
 const productSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   price: z.number().positive(),
+  // Currency the `price` above was entered in (e.g. an admin typing a BDT price).
+  // Converted to USD before storage — products are always stored in USD.
+  currencyCode: z.string().optional(),
   discount: z.number().int().min(0).max(100).default(0),
   image: z.string().min(1),
   images: z.array(z.string().min(1)).optional(), // full gallery; first is the primary
@@ -59,7 +70,8 @@ export const adminListProducts = asyncHandler(async (_req: Request, res: Respons
 export const adminCreateProduct = asyncHandler(async (req: Request, res: Response) => {
   const parsed = productSchema.safeParse(req.body);
   if (!parsed.success) throw new HttpError(400, 'Invalid input', parsed.error.flatten().fieldErrors);
-  const { tags, colors, sizes, images, ...data } = parsed.data;
+  const { tags, colors, sizes, images, currencyCode, ...data } = parsed.data;
+  data.price = await toUsd(data.price, currencyCode);
 
   const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
   if (!category) throw new HttpError(400, 'Category does not exist');
@@ -90,7 +102,8 @@ export const adminUpdateProduct = asyncHandler(async (req: Request, res: Respons
 
   const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) throw new HttpError(404, 'Product not found');
-  const { tags, colors, sizes, name, images, ...rest } = parsed.data;
+  const { tags, colors, sizes, name, images, currencyCode, ...rest } = parsed.data;
+  if (rest.price !== undefined) rest.price = await toUsd(rest.price, currencyCode);
 
   // When a gallery is supplied, replace all rows and sync the primary image.
   const gallery = images?.length
