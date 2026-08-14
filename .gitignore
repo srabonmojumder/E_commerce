@@ -28,6 +28,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# firebase (removed — legacy hosting artifacts)
+.firebase
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env*

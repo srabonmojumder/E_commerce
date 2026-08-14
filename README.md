@@ -45,7 +45,7 @@ npm run dev                        # http://localhost:3000
 
 **Auth:** JWT access token (in `localStorage`) + httpOnly refresh cookie with rotation. A guest cart/wishlist (localStorage) merges into the server account on login.
 
-**Deployment:** API → any Node host + managed MySQL (Railway/Render/Fly/PlanetScale) using the included [`backend/Dockerfile`](backend/Dockerfile). Frontend → Vercel or Firebase App Hosting (note: it is no longer a static export, so plain static Firebase Hosting won't serve the SSR routes).
+**Deployment:** API → any Node host + managed MySQL (Railway/Render/Fly/PlanetScale) using the included [`backend/Dockerfile`](backend/Dockerfile). Frontend → Vercel.
 
 See [`backend/README.md`](backend/README.md) for the full endpoint list.
 
