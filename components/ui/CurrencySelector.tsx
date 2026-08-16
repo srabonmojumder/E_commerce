@@ -18,8 +18,6 @@ export default function CurrencySelector() {
     const activeCode = selectedCode || settings?.currencyCode || 'USD';
     const active = currencies.find((c) => c.code === activeCode);
 
-    if (currencies.length < 2) return null;
-
     useEffect(() => {
         const onClickOutside = (e: MouseEvent) => {
             if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
@@ -27,6 +25,8 @@ export default function CurrencySelector() {
         document.addEventListener('mousedown', onClickOutside);
         return () => document.removeEventListener('mousedown', onClickOutside);
     }, []);
+
+    if (currencies.length < 2) return null;
 
     return (
         <div ref={ref} className="relative hidden sm:block">
