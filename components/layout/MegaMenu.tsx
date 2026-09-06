@@ -39,7 +39,7 @@ export default function MegaMenu() {
     // Inject live categories into Shop's "Top Categories" section.
     const items: MenuItem[] = useMemo(() => {
         const topCategoryLinks = categories.length
-            ? categories.slice(0, 7).map((c) => ({ label: c.name, href: `/products?category=${c.slug}` }))
+            ? categories.map((c) => ({ label: c.name, href: `/products?category=${c.slug}` }))
             : fallbackCategoryLinks;
 
         return [

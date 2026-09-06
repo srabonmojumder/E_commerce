@@ -252,7 +252,7 @@ export default function Home() {
     ];
 
     const websiteSchema = generateWebSiteSchema();
-    const displayCategories = categories.slice(0, 6);
+    const displayCategories = categories;
 
     return (
         <div className="bg-canvas dark:bg-ink-950 min-h-screen">

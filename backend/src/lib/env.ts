@@ -14,6 +14,7 @@ const schema = z.object({
   JWT_REFRESH_EXPIRES: z.string().default('7d'),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
   // SSLCommerz (Bangladesh gateway — cards + bKash/Nagad/bank). Optional; when
   // unset the storefront simply hides it (like Stripe's mock mode).
   SSLCOMMERZ_STORE_ID: z.string().optional(),
