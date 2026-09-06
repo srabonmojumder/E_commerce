@@ -30,6 +30,7 @@ import RecentlyViewedSection from '@/components/product/RecentlyViewedSection';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import FlashSaleSection from '@/components/sections/FlashSaleSection';
 import Reveal from '@/components/anim/Reveal';
+import { useDragScroll } from '@/lib/useDragScroll';
 import {
     useProducts,
     useBanners,
@@ -143,6 +144,10 @@ export default function Home() {
     const tMid = Math.ceil(testimonials.length / 2);
     const tRowA = testimonials.slice(0, tMid);
     const tRowB = testimonials.slice(tMid);
+
+    const categoryScroll = useDragScroll<HTMLElement>();
+    const bestSellersScroll = useDragScroll<HTMLDivElement>();
+    const newArrivalsScroll = useDragScroll<HTMLDivElement>();
 
     // Hero slider — cycles through every active banner from admin (Ken-Burns + crossfade).
     const DEFAULT_HERO = {
@@ -369,7 +374,11 @@ export default function Home() {
 
             {/* Category Navigation (dynamic) */}
             {displayCategories.length > 0 && (
-                <section className="py-12 md:py-20 overflow-x-auto no-scrollbar scroll-smooth">
+                <section
+                    ref={categoryScroll.ref}
+                    {...categoryScroll.events}
+                    className={`py-12 md:py-20 overflow-x-auto no-scrollbar scroll-smooth ${categoryScroll.dragClassName}`}
+                >
                     <div className="max-w-7xl mx-auto px-4 flex gap-8 md:gap-16 justify-start md:justify-center min-w-max">
                         {displayCategories.map((cat, i) => (
                             <motion.div
@@ -420,7 +429,11 @@ export default function Home() {
                     ) : tabProducts.length === 0 ? (
                         <p className="text-center text-secondary dark:text-gray-400 py-12">No products to show here yet.</p>
                     ) : (
-                        <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth">
+                        <div
+                            ref={bestSellersScroll.ref}
+                            {...bestSellersScroll.events}
+                            className={`flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth ${bestSellersScroll.dragClassName}`}
+                        >
                             {tabProducts.map((product) => (
                                 <div key={product.id} className="w-[60%] sm:w-[280px] md:w-[300px] shrink-0 snap-start">
                                     <ProductCard product={product} />
@@ -509,7 +522,11 @@ export default function Home() {
                     ) : newArrivals.length === 0 ? (
                         <p className="text-center text-secondary dark:text-gray-400 py-12">New arrivals are on the way.</p>
                     ) : (
-                        <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth">
+                        <div
+                            ref={newArrivalsScroll.ref}
+                            {...newArrivalsScroll.events}
+                            className={`flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth ${newArrivalsScroll.dragClassName}`}
+                        >
                             {newArrivals.map((product) => (
                                 <div key={product.id} className="w-[60%] sm:w-[280px] md:w-[300px] shrink-0 snap-start">
                                     <ProductCard product={product} />

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Clock, ArrowRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useRecentlyViewedStore } from '@/store/useRecentlyViewedStore';
+import { useDragScroll } from '@/lib/useDragScroll';
 
 interface RecentlyViewedSectionProps {
     /** Exclude a product id (e.g. on the current product detail page). */
@@ -19,6 +20,7 @@ export default function RecentlyViewedSection({ excludeId, title = 'Recently Vie
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
+    const dragScroll = useDragScroll<HTMLDivElement>();
     const recent = useRecentlyViewedStore((s) => s.recentProducts);
     const clear = useRecentlyViewedStore((s) => s.clearRecentlyViewed);
 
@@ -52,7 +54,11 @@ export default function RecentlyViewedSection({ excludeId, title = 'Recently Vie
                     </div>
                 </div>
 
-                <div className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth">
+                <div
+                    ref={dragScroll.ref}
+                    {...dragScroll.events}
+                    className={`flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth ${dragScroll.dragClassName}`}
+                >
                     {items.map((product) => (
                         <div key={product.id} className="w-[60%] sm:w-[280px] md:w-[300px] shrink-0 snap-start">
                             <ProductCard product={product} />

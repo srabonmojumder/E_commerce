@@ -6,6 +6,7 @@ import { Zap, Clock, ArrowRight, Flame } from 'lucide-react';
 import Link from 'next/link';
 import ProductCard from '@/components/product/ProductCard';
 import { Product } from '@/store/useStore';
+import { useDragScroll } from '@/lib/useDragScroll';
 
 interface FlashSaleSectionProps {
     products: Product[];
@@ -93,6 +94,8 @@ const renderer = ({ days, hours, minutes, seconds, completed }: {
 };
 
 export default function FlashSaleSection({ products, endDate, onQuickView }: FlashSaleSectionProps) {
+    const dragScroll = useDragScroll<HTMLDivElement>();
+
     return (
         <section className="py-12 md:py-20 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-slate-900 dark:via-slate-900 dark:to-orange-950/30 relative overflow-hidden">
             {/* Background Pattern */}
@@ -177,11 +180,13 @@ export default function FlashSaleSection({ products, endDate, onQuickView }: Fla
 
                 {/* Products Grid */}
                 <motion.div
+                    ref={dragScroll.ref}
+                    {...dragScroll.events}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 }}
-                    className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth"
+                    className={`flex gap-4 md:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-4 scroll-smooth ${dragScroll.dragClassName}`}
                 >
                     {products.map((product, index) => (
                         <motion.div
